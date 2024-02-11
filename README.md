@@ -20,13 +20,13 @@ const messages = {
 } as const;
 ```
    
-* **Language Codes:** Use standard language codes (e.g., 'en', 'pt', 'es')  as keys for the nested language objects.
+* **Language Codes:** Use standard language codes (e.g., 'en', 'ptBr', 'es')  as keys for the nested language objects.
 
 ```typescript
 const messages = {
    welcome: {
      en: "Welcome!", 
-     pt: "Bem-vindo!",
+     ptBr: "Bem-vindo!",
      // ... more languages
    }
 } as const;
@@ -38,7 +38,7 @@ const messages = {
 const messages = {
    itemCount: {
       en: "You have {{count}} items.",
-      pt: "Você tem {{count}} itens.",
+      ptBr: "Você tem {{count}} itens.",
    }
 } as const;
 ```
@@ -63,12 +63,12 @@ npm install @betof/react-typefull-translate
 1. Declare the messages and languages
 ```typescript
 // translations.ts
-export type Language = "en" | "pt" | "es"
+export type Language = "en" | "ptBr" | "es"
 
 export const messages = {
   welcome: {
     en: "Welcome back, {{username}}!",
-    pt: "Bem-vindo de volta, {{username}}!",
+    ptBr: "Bem-vindo de volta, {{username}}!",
     es: "¡Bienvenido de nuevo, {{username}}!",
   }
 } as const;
@@ -81,8 +81,8 @@ import { useCreateTranslate } from '@betof/react-typefull-translate';
 import { type Language, messages } from "./translations";
 
 export const useTranslate = () => {
-    const language: Language = "pt"; // Get it from your store/url...
-    return useCreateTranslate<Language>(messages, language);
+    const language: Language = "ptBr"; // Get it from your store/url...
+    return useCreateTranslate(messages, language);
 };
 ```
 
@@ -103,6 +103,19 @@ export const App = () => {
 
 # Sample dynamic language with Zustand
 ```typescript
+// translations.ts
+export type Language = "en" | "ptBr" | "es"
+
+export const messages = {
+  welcome: {
+    en: "Welcome back, {{username}}!",
+    ptBr: "Bem-vindo de volta, {{username}}!",
+    es: "¡Bienvenido de nuevo, {{username}}!",
+  }
+} as const;
+```
+
+```typescript
 // useTranslate.ts
 import { create } from "zustand";
 import { useCallback } from "react";
@@ -114,12 +127,36 @@ type UseLanguageStore = {
   changeLanguage(newLanguage: Language): void;
 };
 export const useLanguage = create<UseLanguageStore>()((set) => ({
-  language: "br",
+  language: "ptBr",
   changeLanguage: (newLanguage) => set({ language: newLanguage }),
 }));
 
 export const useTranslate = () => {
   const language = useLanguage(useCallback((s) => s.language, []));
   return useCreateTranslate(messages, language);
+};
+```
+
+```tsx
+import { useLanguage, useTranslate } from "./useTranslate";
+
+import { type Language } from "./translations";
+import { useCallback } from "react";
+
+const LANGUAGES: Language[] = ["ptBr", "en", "es"];
+
+export const App = () => {
+  const { t } = useTranslate();
+  const changeLanguage = useLanguage(useCallback((s) => s.changeLanguage, []));
+
+  return (
+    <div>
+      {LANGUAGES.map((lang) => (
+        <button onClick={() => changeLanguage(lang)}> {lang} </button>
+      ))}
+      
+      <h1>{t("welcome", { username: "Bob" })}</h1>
+    </div>
+  );
 };
 ```
