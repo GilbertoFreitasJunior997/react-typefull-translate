@@ -17,7 +17,7 @@ const messages = {
      welcome: { ... },  // Translation key: 'welcome'
      goodbye: { ... },  // Translation key: 'goodbye'
      // ... more translation keys
-};
+} as const;
 ```
    
 * **Language Codes:** Use standard language codes (e.g., 'en', 'pt', 'es')  as keys for the nested language objects.
@@ -29,7 +29,7 @@ const messages = {
      pt: "Bem-vindo!",
      // ... more languages
    }
-}
+} as const;
    ```
 
 * **Placeholders:**  Utilize double curly braces to define dynamic placeholders in your translations.  
@@ -40,7 +40,7 @@ const messages = {
       en: "You have {{count}} items.",
       pt: "Você tem {{count}} itens.",
    }
-}
+} as const;
 ```
    
 
