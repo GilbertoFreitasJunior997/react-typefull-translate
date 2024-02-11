@@ -7,8 +7,15 @@ type ExtractReplaces<T extends string> =
     ? Msg | ExtractReplaces<Next>
     : never;
 
+type ReplaceTemplate = "singleCurly" | "dualCurly";
+
 type UseCreateTranslateOptions = {
   onError?: (error: unknown, defaultMessage: string) => void;
+
+  /**
+   * @default "dualCurly"
+   */
+  replaceTemplate?: ReplaceTemplate;
 };
 
 /**
@@ -37,7 +44,7 @@ const useCreateTranslate = <
 >(
   messages: TMessages,
   language: TLanguage,
-  { onError }: UseCreateTranslateOptions
+  { onError, replaceTemplate = "dualCurly" }: UseCreateTranslateOptions
 ) => {
   const t = useCallback(
     <
@@ -71,7 +78,9 @@ const useCreateTranslate = <
               if (key in replaces) {
                 const replacedValue = replaces[key as keyof typeof replaces];
                 if (replacedValue !== null && replacedValue !== undefined) {
-                  translated = translated.replace(`{{${key}}}`, replacedValue);
+                  const replace =
+                    replaceTemplate === "dualCurly" ? `{{${key}}}` : `{${key}}`;
+                  translated = translated.replace(replace, replacedValue);
                 }
               }
             }
@@ -95,7 +104,7 @@ const useCreateTranslate = <
         return "" as TValue;
       }
     },
-    [language, messages, onError]
+    [language, messages, onError, replaceTemplate]
   );
 
   return useMemo(() => ({ t }), [t]);
@@ -105,4 +114,5 @@ export {
   useCreateTranslate,
   NoTranslationAvaliableError,
   UseCreateTranslateOptions,
+  ReplaceTemplate,
 };
