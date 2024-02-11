@@ -88,6 +88,7 @@ export const useTranslate = () => {
 
 3. Use the hook
 ```tsx
+// App.tsx
 import { useTranslate } from "./useTranslate";
 
 export const App = () => {
@@ -138,6 +139,7 @@ export const useTranslate = () => {
 ```
 
 ```tsx
+// App.tsx
 import { useLanguage, useTranslate } from "./useTranslate";
 
 import { type Language } from "./translations";
