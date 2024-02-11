@@ -1,9 +1,15 @@
 import { useCallback, useMemo } from "react";
 
+import { NoTranslationAvaliableError } from "./errors";
+
 type ExtractReplaces<T extends string> =
   T extends `${infer _Prev}{{${infer Msg}}}${infer Next}`
     ? Msg | ExtractReplaces<Next>
     : never;
+
+type UseCreateTranslateOptions = {
+  onError?: (error: unknown, defaultMessage: string) => void;
+};
 
 /**
  * A powerful React hook for creating customizable and type-safe translation functions.
@@ -20,17 +26,18 @@ type ExtractReplaces<T extends string> =
  *   },
  * } as const;
  * const useTranslate = () => useCreateTranslate(messages, 'en');
- * 
+ *
  * const { t } = useTranslate();
  * const greeting = t('hello', { name: 'Alice' }); // greeting will be "Hello, Alice!"
  * ```
  */
-export const useCreateTranslate = <
+const useCreateTranslate = <
   TLanguage extends string,
   TMessages extends Record<string, Record<TLanguage, string>>
 >(
   messages: TMessages,
-  language: TLanguage
+  language: TLanguage,
+  { onError }: UseCreateTranslateOptions
 ) => {
   const t = useCallback(
     <
@@ -73,18 +80,29 @@ export const useCreateTranslate = <
           return translated as TValue;
         }
 
-        throw new Error("NO TRANSLATION AVALIABLE");
+        throw new NoTranslationAvaliableError(key, language, replaces);
       } catch (error: unknown) {
-        console.error(
-          `ERROR TRANSLATING MESSAGE ${String(key)}. REPLACES:`,
-          replaces
-        );
-        console.error(error);
+        const defaultMessage = `Error translating ${String(
+          key
+        )}. Language: ${language}. Replaces: ${replaces || "none"}`;
+
+        if (onError) {
+          onError(error, defaultMessage);
+        } else {
+          console.error(defaultMessage, error);
+        }
+
         return "" as TValue;
       }
     },
-    [language, messages]
+    [language, messages, onError]
   );
 
   return useMemo(() => ({ t }), [t]);
+};
+
+export {
+  useCreateTranslate,
+  NoTranslationAvaliableError,
+  UseCreateTranslateOptions,
 };
