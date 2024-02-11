@@ -82,7 +82,7 @@ import { type Language, messages } from "./translations";
 
 export const useTranslate = () => {
     const language: Language = "pt"; // Get it from your store/url...
-    return useCreateTranslate<Language>(messages, "pt");
+    return useCreateTranslate<Language>(messages, language);
 };
 ```
 
