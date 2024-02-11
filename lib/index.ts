@@ -35,7 +35,7 @@ type UseCreateTranslateOptions<TReplaceTemplate extends ReplaceTemplate> = {
  * const messages = {
  *   hello: {
  *     en: "Hello, {{name}}!",
- *     pt: "Olá, {{name}}!",
+ *     ptBr: "Olá, {{name}}!",
  *   },
  * } as const;
  * const useTranslate = () => useCreateTranslate(messages, 'en');
